@@ -4,6 +4,9 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoute');
+
 app.use(express.json());
 const corsOptions = {
   origin: 'http://localhost:5173',
@@ -18,7 +21,8 @@ app.use(cors(corsOptions));
 app.get('/', (req, res) => {
   res.json('Hello World');
 });
-// app.use('/api/recipes', recipeRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/auth', authRoutes);
 
 mongoose.connect(process.env.MONGODB_KEY).then(() => {
   console.log('Connected to database');
