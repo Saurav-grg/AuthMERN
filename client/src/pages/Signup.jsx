@@ -5,6 +5,7 @@ export default function Signup() {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [msg, setMsg] = useState();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -14,6 +15,7 @@ export default function Signup() {
     try {
       setLoading(true);
       setError(false);
+      setMsg(null);
       const res = await fetch('/api/auth/sign-up', {
         method: 'POST',
         headers: {
@@ -24,13 +26,15 @@ export default function Signup() {
       const data = await res.json();
       setLoading(false);
       // console.log(data);
-      if (data.success === false) {
+      if (!res.ok || data.success === false) {
         setError(true);
+        setMsg(data.message);
         return;
       }
-    } catch (error) {}
-    setLoading(false);
-    setError(true);
+    } catch (error) {
+      setLoading(false);
+      setError(true);
+    }
   };
   // console.log(formData);
   return (
@@ -38,7 +42,7 @@ export default function Signup() {
       <h1 className="text-3xl text-center font-semibold my-7"> sign up</h1>
       {error && (
         <p className="text-red-600 bg-red-100 my-2 px-2 py-1">
-          Something went wrong!!!
+          Something went wrong!!! {msg}
         </p>
       )}
 
