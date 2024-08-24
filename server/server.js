@@ -8,19 +8,17 @@ const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoute');
 
 app.use(express.json());
+
 const corsOptions = {
   origin: 'http://localhost:5173',
-  credentials: true,
 };
+app.use(cors(corsOptions));
+
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
 });
 
-app.use(cors(corsOptions));
-app.get('/', (req, res) => {
-  res.json('Hello World');
-});
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 
