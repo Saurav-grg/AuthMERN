@@ -2,12 +2,14 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoute');
 
 app.use(express.json());
+app.use(cookieParser());
 
 const corsOptions = {
   origin: 'http://localhost:5173',
