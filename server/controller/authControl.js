@@ -93,6 +93,9 @@ const logout = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
+    if (!email || !password) {
+      throw new Error('All fields are required');
+    }
     const user = await User.findOne({ email });
     if (!user) {
       return res
@@ -209,6 +212,46 @@ const checkAuth = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+const google = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
+      genTokenAndSetCookie(res, user._id);
+      user.lastLogin = new Date();
+      await user.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Logged in successfully',
+        user: {
+          ...user._doc,
+          password: undefined,
+        },
+      });
+    } else {
+      const newUser = await new User({
+        username:
+          req.body.name.split(' ').join('').toLowerCase() +
+          Math.random().toString(36).slice(-8),
+        email: req.body.email,
+        profilePicture: req.body.photoURL,
+      });
+      newUser.isVerified = true;
+      await newUser.save();
+      genTokenAndSetCookie(res, newUser._id);
+      res.status(201).json({
+        success: true,
+        message: 'User created successfully',
+        user: {
+          ...newUser._doc,
+          password: undefined,
+        },
+      });
+    }
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
 module.exports = {
   signup,
   verifyEmail,
@@ -217,4 +260,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   checkAuth,
+  google,
 };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore';
+import Oauth from '../components/Oauth';
 
 export default function Signup() {
   // const [formData, setFormData] = useState({});
@@ -71,7 +72,7 @@ export default function Signup() {
 						font-bold rounded-lg shadow-lg hover:from-green-600
 						hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
 						 focus:ring-offset-gray-900 transition duration-200"
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isLoading}
@@ -83,6 +84,10 @@ export default function Signup() {
             )}
           </motion.button>
         </form>
+        <div className="text-center p-2 text-xl font-semibold text-gray-500">
+          or
+        </div>
+        <Oauth />
       </div>
       <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
         <p className="text-sm text-gray-400">
