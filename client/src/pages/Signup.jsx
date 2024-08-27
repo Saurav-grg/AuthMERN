@@ -77,7 +77,6 @@ export default function Signup() {
             disabled={isLoading}
           >
             {isLoading ? (
-              // <Loader className=" animate-spin mx-auto" size={24} />
               <div class="border-gray-300 size-8 mx-auto animate-spin rounded-full border-4 border-t-blue-600" />
             ) : (
               'Sign Up'
