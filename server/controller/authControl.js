@@ -28,7 +28,7 @@ const signup = async (req, res) => {
       100000 + Math.random() * 900000
     ).toString();
     //store user in db
-    const newUser = await User.create({
+    const user = await User.create({
       username,
       email,
       password: hashedPassword,
@@ -36,14 +36,14 @@ const signup = async (req, res) => {
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
     });
 
-    genTokenAndSetCookie(res, newUser._id);
+    genTokenAndSetCookie(res, user._id);
     await sendVerificationEmail(email, verificationToken);
 
     res.status(201).json({
       success: true,
       message: 'User created successfully',
-      newUser: {
-        ...newUser._doc,
+      user: {
+        ...user._doc,
         password: undefined,
       },
     });

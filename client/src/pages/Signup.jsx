@@ -1,87 +1,98 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useAuthStore } from '../store/authStore';
 
 export default function Signup() {
-  const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [msg, setMsg] = useState();
+  // const [formData, setFormData] = useState({});
+  // const handleChange = (e) => {
+  //   setFormData({ ...formData, [e.target.id]: e.target.value });
+  // };
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  // const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
-  };
+  const { signup, error, isLoading } = useAuthStore();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      setLoading(true);
-      setError(false);
-      setMsg(null);
-      const res = await fetch('/api/auth/sign-up', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      setLoading(false);
-      // console.log(data);
-      if (!res.ok || data.success === false) {
-        setError(true);
-        setMsg(data.message);
-        return;
-      }
+      await signup(email, password, name);
+      navigate('/verify-email');
     } catch (error) {
-      setLoading(false);
-      setError(true);
+      console.log(error);
+      // setError(error)
     }
   };
   // console.log(formData);
   return (
-    <div className="max-w-lg mx-auto p-2">
-      <h1 className="text-3xl text-center font-semibold my-7"> sign up</h1>
-      {error && (
-        <p className="text-red-600 bg-red-100 my-2 px-2 py-1">
-          Something went wrong!!! {msg}
-        </p>
-      )}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-md mx-auto my-auto mt-10 w-full bg-gray-400 bg-opacity-50 rounded-2xl shadow-2xl 
+			overflow-hidden"
+    >
+      <div className="p-8">
+        <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
+          Create New Account
+        </h2>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2 ">
-        <input
-          type="text"
-          placeholder="username"
-          id="username"
-          className="bg-slate-100 p-3 rounded"
-          onChange={handleChange}
-        />
-        <input
-          type="email"
-          placeholder="enter email"
-          id="email"
-          className="bg-slate-100 p-3 rounded"
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          placeholder="password"
-          id="password"
-          className="bg-slate-100 p-3 rounded"
-          onChange={handleChange}
-        />
-        <button
-          disabled={loading}
-          className="bg-slate-700 p-3 text-white rounded hover:opacity-90 disabled:opacity-80"
-        >
-          {loading ? 'Loading...' : 'SIGN UP'}
-        </button>
-      </form>
-      {/* <button className="bg-red-600 text-white p-3 rounded">Google</button> */}
-      <div className="flex gap-2">
-        <p>Have an account ? </p>
-        <Link to="/sign-in">
-          <span className="text-blue-600">Sign in</span>
-        </Link>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <input
+            type="text"
+            placeholder="Full Name"
+            className="w-full pl-4 placeholder:text-sm pr-3 py-3 bg-gray-100 bg-opacity-50 rounded-lg border-none "
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            className="w-full pl-4 placeholder:text-sm pr-3 py-3 bg-gray-100 bg-opacity-50 rounded-lg border-none "
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className="w-full pl-4 placeholder:text-sm pr-3 py-3 bg-gray-100 bg-opacity-50 rounded-lg border-none "
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
+          {/* <PasswordStrengthMeter password={password} /> */}
+
+          <motion.button
+            className="mt-2 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
+						font-bold rounded-lg shadow-lg hover:from-green-600
+						hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+						 focus:ring-offset-gray-900 transition duration-200"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              // <Loader className=" animate-spin mx-auto" size={24} />
+              <div class="border-gray-300 size-8 mx-auto animate-spin rounded-full border-4 border-t-blue-600" />
+            ) : (
+              'Sign Up'
+            )}
+          </motion.button>
+        </form>
       </div>
-    </div>
+      <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
+        <p className="text-sm text-gray-400">
+          Already have an account?{' '}
+          <Link to={'/login'} className="text-green-400 hover:underline">
+            Login
+          </Link>
+        </p>
+      </div>
+    </motion.div>
   );
 }
