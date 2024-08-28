@@ -3,6 +3,7 @@ const crypto = require('crypto');
 
 const User = require('../models/userModel');
 const genTokenAndSetCookie = require('../utils/genTokenAndSetCookie');
+const admin = require('../firebase/firebase');
 
 const {
   sendVerificationEmail,
@@ -32,6 +33,7 @@ const signup = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      authProvider: 'email',
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
     });
@@ -214,42 +216,56 @@ const checkAuth = async (req, res) => {
 };
 const google = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
-    if (user) {
-      genTokenAndSetCookie(res, user._id);
-      user.lastLogin = new Date();
-      await user.save();
+    // Verify the ID token
+    const { idToken } = req.body;
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
 
-      res.status(200).json({
-        success: true,
-        message: 'Logged in successfully',
-        user: {
-          ...user._doc,
-          password: undefined,
-        },
-      });
+    // The token is valid. The user's UID and email can be trusted.
+    const { uid, email, name, picture } = decodedToken;
+
+    // Look for an existing user
+    let user = await User.findOne({ email: email });
+
+    if (user) {
+      // Update user information if necessary
+      user.lastLogin = new Date();
+      if (!user.firebaseUID) {
+        user.firebaseUID = uid;
+      }
+      await user.save();
     } else {
-      const newUser = await new User({
+      // Create a new user
+      user = new User({
         username:
-          req.body.name.split(' ').join('').toLowerCase() +
+          name.split(' ').join('').toLowerCase() +
           Math.random().toString(36).slice(-8),
-        email: req.body.email,
-        profilePicture: req.body.photoURL,
+        email: email,
+        firebaseUID: uid,
+        profilePicture: picture,
+        isVerified: true,
+        authProvider: 'google',
       });
-      newUser.isVerified = true;
-      await newUser.save();
-      genTokenAndSetCookie(res, newUser._id);
-      res.status(201).json({
-        success: true,
-        message: 'User created successfully',
-        user: {
-          ...newUser._doc,
-          password: undefined,
-        },
-      });
+      await user.save();
     }
+
+    // Generate token and set cookie
+    genTokenAndSetCookie(res, user._id);
+
+    res.status(200).json({
+      success: true,
+      message: user.isNew
+        ? 'User created successfully'
+        : 'Logged in successfully',
+      user: {
+        ...user._doc,
+        password: undefined,
+      },
+    });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    console.error('Google authentication error:', error);
+    res
+      .status(400)
+      .json({ success: false, message: 'Google authentication failed' });
   }
 };
 module.exports = {

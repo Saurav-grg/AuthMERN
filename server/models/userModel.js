@@ -16,6 +16,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       // required: true,
     },
+    authProvider: {
+      type: String,
+      enum: ['email', 'google'],
+      required: true,
+    },
+    firebaseUID: {
+      type: String,
+      sparse: true,
+      required: function () {
+        return this.authProvider === 'google';
+      },
+    },
     lastLogin: {
       type: Date,
       default: Date.now,

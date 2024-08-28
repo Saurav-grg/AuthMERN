@@ -1,10 +1,14 @@
 import { create } from 'zustand';
 import axios from 'axios';
-
+import { GoogleAuthProvider, signInWithPopup, getAuth } from 'firebase/auth';
+import { app } from '../firebase';
 // const API_URL = import.meta.env.MODE === "development" ? "http://localhost:3000/api/auth" : "/api/auth";
 const API_URL = 'http://localhost:3000/api/auth';
 
 axios.defaults.withCredentials = true;
+
+const provider = new GoogleAuthProvider();
+const auth = getAuth(app);
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -58,7 +62,28 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
-
+  googleAuth: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
+      const res = await axios.post(`${API_URL}/google`, {
+        idToken: idToken,
+      });
+      set({
+        isAuthenticated: true,
+        user: response.data.user,
+        error: null,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        error: error.response.data || 'Error authenticating',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
   logout: async () => {
     set({ isLoading: true, error: null });
     try {
