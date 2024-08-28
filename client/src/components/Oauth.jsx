@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import { GoogleAuthProvider, signInWithPopup, getAuth } from 'firebase/auth';
 // import { app } from '../firebase';
@@ -10,36 +10,6 @@ export default function Oauth() {
   const handleGoogleClick = async () => {
     await googleAuth();
     navigate('/');
-    // try {
-    //   const provider = new GoogleAuthProvider();
-    //   const auth = getAuth(app);
-
-    //   const result = await signInWithPopup(auth, provider);
-    //   const idToken = await result.user.getIdToken();
-
-    //   const res = await fetch('/api/auth/google', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       idToken: idToken,
-    //     }),
-    //   });
-
-    //   // Handle the response from your backend
-    //   if (res.ok) {
-    //     const data = await res.json();
-    //
-    //     // Handle successful login/signup
-    //     console.log('Authentication successful', data);
-    //   } else {
-    //     // Handle errors
-    //     console.error('Authentication failed');
-    //   }
-    // } catch (error) {
-    //   console.error('Error during Google sign-in:', error);
-    // }
   };
   return (
     <>

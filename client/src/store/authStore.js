@@ -72,14 +72,14 @@ export const useAuthStore = create((set) => ({
       });
       set({
         isAuthenticated: true,
-        user: response.data.user,
-        error: null,
+        user: res.data.user,
         isLoading: false,
+        error: null,
       });
     } catch (error) {
       set({
-        error: error.response.data || 'Error authenticating',
         isLoading: false,
+        error: error.response.data || 'Error authenticating',
       });
       throw error;
     }

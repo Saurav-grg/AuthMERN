@@ -13,10 +13,10 @@ import { useEffect } from 'react';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 function App() {
-  const { isCheckingAuth, checkAuth } = useAuthStore();
+  const { isCheckingAuth, checkAuth, googleAuth } = useAuthStore();
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+  }, [checkAuth, googleAuth]);
 
   // protect routes that require authentication
   const ProtectedRoute = ({ children }) => {
@@ -41,6 +41,15 @@ function App() {
 
     return children;
   };
+  if (isCheckingAuth)
+    return (
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div
+          class="border-gray-300 size-8 mx-auto animate-spin 
+      rounded-full border-4 border-t-blue-600"
+        />
+      </div>
+    );
   return (
     <BrowserRouter>
       <Header />

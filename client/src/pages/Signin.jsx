@@ -8,7 +8,7 @@ export default function Signin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const { login, isLoading, error } = useAuthStore();
+  const { login, isLoading: mailLoader, error } = useAuthStore();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -58,9 +58,9 @@ export default function Signin() {
             whileTap={{ scale: 0.98 }}
             className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200"
             type="submit"
-            disabled={isLoading}
+            disabled={mailLoader}
           >
-            {isLoading ? (
+            {mailLoader ? (
               <div className="border-gray-300 size-8 mx-auto animate-spin rounded-full border-4 border-t-blue-600" />
             ) : (
               'Login'
