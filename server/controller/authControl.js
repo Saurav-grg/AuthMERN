@@ -7,11 +7,10 @@ const admin = require('../firebase/firebase');
 
 const {
   sendVerificationEmail,
-  sendWelcomeEmail,
+  // sendWelcomeEmail,
   sendPasswordResetEmail,
-  sendResetSuccessEmail,
+  // sendResetSuccessEmail,
 } = require('../mailtrap/emails');
-
 //sign up
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -73,7 +72,7 @@ const verifyEmail = async (req, res) => {
     user.verificationTokenExpiresAt = undefined;
     await user.save();
 
-    await sendWelcomeEmail(user.email, user.name);
+    // await sendWelcomeEmail(user.email, user.name);
     res.status(200).json({
       success: true,
       message: 'Email verified successfully',
@@ -112,7 +111,7 @@ const login = async (req, res) => {
     }
 
     genTokenAndSetCookie(res, user._id);
-
+    // await sendWelcomeEmail(email);
     user.lastLogin = new Date();
     await user.save();
 
@@ -189,7 +188,7 @@ const resetPassword = async (req, res) => {
     user.resetPasswordExpiresAt = undefined;
     await user.save();
 
-    await sendResetSuccessEmail(user.email);
+    // await sendResetSuccessEmail(user.email);
 
     res
       .status(200)
@@ -250,7 +249,6 @@ const google = async (req, res) => {
 
     // Generate token and set cookie
     genTokenAndSetCookie(res, user._id);
-
     res.status(200).json({
       success: true,
       message: user.isNew
